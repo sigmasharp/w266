@@ -48,13 +48,12 @@ Setting up your instance
 ------------------------
 In your ssh terminal, type:
 ```
-# TODO: replace this with the public repo
-git clone https://github.com/iftenney/W266.git
-cd W266/cloud
+git clone https://github.com/datasci-w266/main.git ~/w266
+cd w266/cloud
 ./setup.sh
 ```
 
-setup.sh installs Anaconda and TensorFlow. There are a handful of times you'll need to accept the license agreement or confirm an install path (just accept the defaults, including modifying your .bashrc file).
+`setup.sh` installs Anaconda and TensorFlow. There are a handful of times you'll need to accept the license agreement or confirm an install path (just accept the defaults, including modifying your .bashrc file).
 
 Run a notebook and connect to it from your local machine
 --------------------------------------------------------
@@ -68,9 +67,9 @@ In order to use Jupyter notebooks, we need to set up an SSH tunnel. This will al
 * If you're able to log in successfully, hit Ctrl+D or type `logout` to exit.
 
 * Run the following command, which will SSH to your server _and_ tunnel ports 8888 and 6006:
-````
+```
 gcloud compute ssh --ssh-flag=”-L 8888:127.0.0.1:8888” --ssh-flag=”-L 6006:127.0.0.1:6006” <host-name>
-````
+```
 That's a lot to type every time, so you might want to make a [shell alias](https://www.digitalocean.com/community/tutorials/an-introduction-to-useful-bash-aliases-and-functions) for it. Port 8888 is the default for Jupyter, and we'll be using port 6006 to access some monitoring interfaces for TensorFlow.
 
 * If you're successfully logged in, start a Jupyter notebook server with `jupyter notebook`. You should see a message like "The Jupyter Notebook is running at: http://localhost:8888":
@@ -95,9 +94,9 @@ Shutting down your instance
 **Don't forget to shut down your instance**, or you will quickly use up all your free credits.
 
 * The easiest and safest way to shut down your instance is to type the following in the ssh session:
-````
+```
 sudo shutdown now
-````
+```
 
 Alternatively, you can force your instance down by:
 
