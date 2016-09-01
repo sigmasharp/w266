@@ -1,4 +1,4 @@
-# Week 1 Section Materials
+# Week 1: Introduction
 
-Placeholder; put week 1 notebooks here.
-
+- Course Set-Up Guide
+- TensorFlow Tutorial

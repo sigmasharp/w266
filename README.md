@@ -11,3 +11,7 @@ or
 ```
 git clone git@github.com:datasci-w266/main.git ~/w266
 ```
+
+## Week 1: Introduction
+
+Head to the [Course Set-Up guide](week1/Course%20Set-Up.ipynb) to get started.
