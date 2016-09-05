@@ -31,7 +31,7 @@ Start the Compute Engine instance
 *  From the hamburger menu again, select "Compute Engine"
 *  (You may see a dialog box for a minute or two as Compute Engine initializes for your project.)
 *  Click "Create Instance"
-*  Fill in the instance creation form as shown below. Don't worry about the cost; the rate shown assumesalways-on, so you shouldn't come close to the limit if you shut down when not in use.
+*  Fill in the instance creation form as shown below. Don't worry about the cost; the rate shown assumes always-on, so you shouldn't come close to the limit if you shut down when not in use.
 
 ![Create instance](screenshots/6-createinstance.png "Create instance")
 
