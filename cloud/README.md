@@ -33,13 +33,13 @@ Start the Compute Engine instance
 *  Click "Create Instance"
 *  Fill in the instance creation form as shown below. Don't worry about the cost; the rate shown assumes always-on, so you shouldn't come close to the limit if you shut down when not in use.
 
-![Create instance](screenshots/6-createinstance.png "Create instance")
+    * Name: w266
+    * Zone: pick one close to you
+    * Machine Type: 4 vCPUs, 3.6 GB
+    * Boot Disk: Ubuntu 16.04 LTS (modify boot disk size to **100 GB**)
+    * (Optionally) allow HTTP(s) traffic
 
-  * Name: w266
-  * Zone: pick one close to you
-  * Machine Type: 4 vCPUs, 3.6 GB
-  * Boot Disk: Ubuntu 16.04 LTS (modify boot disk size to **100 GB**)
-  * (Optionally) allow HTTP(s) traffic
+![Create instance](screenshots/6-createinstance.png "Create instance")
 
 *  Before clicking "Create", be absolutely sure that you have increased the disk space to at least 100 GB and have selected Ubuntu as your OS (the setup script that you'll run in a later step may not work otherwise).
 *  Click "Create" at the bottom of the form.  You may need to wait a minute or two for your instance to boot.
