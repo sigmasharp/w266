@@ -35,6 +35,12 @@ Start the Compute Engine instance
 
 ![Create instance](screenshots/6-createinstance.png "Create instance")
 
+  * Name: w266
+  * Zone: pick one close to you
+  * Machine Type: 4 vCPUs, 3.6 GB
+  * Boot Disk: Ubuntu 16.04 LTS (modify boot disk size to **100 GB**)
+  * (Optionally) allow HTTP(s) traffic
+
 *  Before clicking "Create", be absolutely sure that you have increased the disk space to at least 100 GB and have selected Ubuntu as your OS (the setup script that you'll run in a later step may not work otherwise).
 *  Click "Create" at the bottom of the form.  You may need to wait a minute or two for your instance to boot.
 
@@ -53,7 +59,7 @@ cd w266/cloud
 ./setup.sh
 ```
 
-`setup.sh` installs Anaconda and TensorFlow. There are a handful of times you'll need to accept the license agreement or confirm an install path (just accept the defaults, including modifying your .bashrc file).
+`setup.sh` installs Anaconda and TensorFlow. There are a handful of times you'll need to accept the license agreement or confirm an install path (just accept the defaults, and allow it to modify your .bashrc file).
 
 Run a notebook and connect to it from your local machine
 --------------------------------------------------------
