@@ -57,6 +57,7 @@ In your ssh terminal, type:
 git clone https://github.com/datasci-w266/main.git ~/w266
 cd w266/cloud
 ./setup.sh
+source ~/.bashrc
 ```
 
 `setup.sh` installs Anaconda and TensorFlow. There are a handful of times you'll need to accept the license agreement or confirm an install path (just accept the defaults, and allow it to modify your .bashrc file).
