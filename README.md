@@ -5,7 +5,7 @@ course materials.
 
 ## Week 1: Introduction
 
-Head to the [Course Set-Up guide](week1/Course%20Set-Up.ipynb) to get started.
+Head to the [week 1 materials](week1/) to get started.
 
 ## Week 2: Language Modeling I
 
