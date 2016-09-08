@@ -1,4 +1,4 @@
 # Week 2 Section Materials
 
-Placeholder; put week 2 notebooks here.
-
+- [Language Modeling I notebook](Language%20Modeling%20I.ipynb)
+- [segmenter demo](segment/segment.py)
