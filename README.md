@@ -8,3 +8,5 @@ course materials.
 ### [Week 2: Language Modeling I](week2/)
 
 ### [Week 3: Clusters and Distributions](week3/)
+
+### [Week 4: Language Modeling II](week4/)
