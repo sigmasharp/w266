@@ -10,3 +10,6 @@ course materials.
 ### [Week 3: Clusters and Distributions](week3/)
 
 ### [Week 4: Language Modeling II](week4/)
+
+### [Week 5: Units of Meaning](week5/)
+
