@@ -13,3 +13,5 @@ course materials.
 
 ### [Week 5: Units of Meaning](week5/)
 
+### [Week 6: Information Retrieval](week6/)
+
