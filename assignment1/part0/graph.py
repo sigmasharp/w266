@@ -21,10 +21,12 @@ class AddTwo(object):
         # Hint:  You'll want to look at tf.placeholder and sess.run.
 
         # START YOUR CODE
+        pass
         # END YOUR CODE
 
     def Add(self, x, y):
         # START YOUR CODE
+        pass
         # END YOUR CODE
 
 def affine_layer(hidden_dim, x, seed=0):
@@ -33,6 +35,7 @@ def affine_layer(hidden_dim, x, seed=0):
     # seed: use this seed for xavier initialization.
 
     # START YOUR CODE
+    pass
     # END YOUR CODE
 
 def fully_connected_layers(hidden_dims, x):
@@ -44,6 +47,7 @@ def fully_connected_layers(hidden_dims, x):
     # unique.
 
     # START YOUR CODE
+    pass
     # END YOUR CODE
 
 def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate):
@@ -72,6 +76,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate):
     # - train_op: the training operation resulting from minimizing the loss
     #             with a GradientDescentOptimizer
     # START YOUR CODE
+    pass
 
     # END YOUR CODE
 
@@ -94,6 +99,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate):
 
             # Populate loss_value with the loss this iteration.
             # START YOUR CODE
+            pass
             # END YOUR CODE
         if epoch_num % 300 == 0:
             print 'Step: ', global_step_value, 'Loss:', loss_value
@@ -103,4 +109,5 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate):
 
     # Return your predictions.
     # START YOUR CODE
+    pass
     # END YOUR CODE
