@@ -46,8 +46,7 @@ def fully_connected_layers(hidden_dims, x):
     # START YOUR CODE
     # END YOUR CODE
 
-def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs,
-        learning_rate, verbose=False):
+def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate):
     # Train a neural network consisting of fully_connected_layers
     # to predict y.  Use sigmoid_cross_entropy_with_logits loss between the
     # prediction and the label.
@@ -83,11 +82,10 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs,
     sess.run(tf.initialize_all_variables())
     print 'Initial loss:', sess.run(loss, feed_dict={x_ph: X, y_ph: y})
 
-    if verbose:
-      for var in tf.trainable_variables():
-          print 'Variable: ', var.name, var.get_shape()
-          print 'dJ/dVar: ', sess.run(
-                  tf.gradients(loss, var), feed_dict={x_ph: X, y_ph: y})
+    for var in tf.trainable_variables():
+        print 'Variable: ', var.name, var.get_shape()
+        print 'dJ/dVar: ', sess.run(
+                tf.gradients(loss, var), feed_dict={x_ph: X, y_ph: y})
 
     for epoch_num in xrange(num_epochs):
         for batch in xrange(0, X.shape[0], batch_size):
@@ -99,10 +97,9 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs,
             # END YOUR CODE
         if epoch_num % 300 == 0:
             print 'Step: ', global_step_value, 'Loss:', loss_value
-            if verbose:
-                for var in tf.trainable_variables():
-                    print var.name, sess.run(var)
-                print ''
+            for var in tf.trainable_variables():
+                print var.name, sess.run(var)
+            print ''
 
     # Return your predictions.
     # START YOUR CODE
