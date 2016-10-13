@@ -15,3 +15,5 @@ course materials.
 
 ### [Week 6: Information Retrieval](week6/)
 
+### [Week 7: Part-of-Speech Tagging I](week7/)
+
