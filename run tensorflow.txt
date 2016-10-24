@@ -1,0 +1,13 @@
+https://github.com/tensorflow/tensorflow/issues/42
+http://stackoverflow.com/questions/33636925/how-do-i-start-tensorflow-docker-jupyter-notebook
+docker-machine create vdocker -d virtualbox
+
+http://stackoverflow.com/questions/33636925/how-do-i-start-tensorflow-docker-jupyter-notebook
+
+docker run -p 8888:8888 -p 6006:6006 b.gcr.io/tensorflow/tensorflow 
+
+FOR /f "tokens=*" %i IN ('docker-machine env --shell cmd vdocker') DO %i
+
+
+$ docker run -it -p 8888:8888 -p 6006:6006 -v /$(pwd)/tensorflow:/notebooks --name tf b.gcr.io/tensorflow/tensorflow
+docker run -it b.gcr.io/tensorflow/tensorflow
