@@ -21,15 +21,21 @@ class AddTwo(object):
         # Hint:  You'll want to look at tf.placeholder and sess.run.
 
         # START YOUR CODE
-        pass
+        #self.graph = tf.Graph()
+        self.x0 = tf.placeholder("float")
+        self.y0 = tf.placeholder("float")
+
+        
         # END YOUR CODE
 
     def Add(self, x, y):
         # START YOUR CODE
-        pass
+        with tf.Session() as sess:
+            r = tf.add(self.x0, self.y0)
+            return sess.run(r, feed_dict={self.x0: x, self.y0: y}) 
         # END YOUR CODE
 
-def affine_layer(hidden_dim, x, seed=0):
+def affine_layerself(hidden_dim, x, seed=0):
     # x: a [batch_size x # features] shaped tensor.
     # hidden_dim: a scalar representing the # of nodes.
     # seed: use this seed for xavier initialization.
