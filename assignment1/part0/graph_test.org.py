@@ -55,11 +55,6 @@ class TestNN(unittest.TestCase):
         y_model = graph.train_nn(X_train, y_train, X_test,
                 [], 50, 2000, 0.001)
 
-    def test_train_nn_with_fclayers(self):
-        X_train, y_train, X_test, y_test = generate_data(1000, 10)
-        y_model = graph.train_nn(X_train, y_train, X_test,
-                [10, 22, 37], 50, 2000, 0.001)
-
 
 def generate_data(num_train, num_test):
     np.random.seed(1)
@@ -96,7 +91,3 @@ def generate_non_linear_data(num_train, num_test):
     y = y[shuf_idx]
 
     return X[:num_train], y[:num_train], X[num_train:], y[num_train:]
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -7,7 +7,11 @@ http://stackoverflow.com/questions/33636925/how-do-i-start-tensorflow-docker-jup
 docker run -p 8888:8888 -p 6006:6006 b.gcr.io/tensorflow/tensorflow 
 
 FOR /f "tokens=*" %i IN ('docker-machine env --shell cmd vdocker') DO %i
+docker run -d -p 8888:8888 -p 6006:6006 -v //c/Users/Alan/Desktop/w266:/notebooks --name w266 b.gcr.io/tensorflow/tensorflow
+
+$ docker run -d -p 8888:8888 -p 6006:6006 -v //c/Users/Alan/Desktop/w266:/notebooks --name w266 b.gcr.io/tensorflow/tensorflow
 
 
-$ docker run -it -p 8888:8888 -p 6006:6006 -v /$(pwd)/tensorflow:/notebooks --name tf b.gcr.io/tensorflow/tensorflow
+$ 
+
 docker run -it b.gcr.io/tensorflow/tensorflow

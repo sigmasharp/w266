@@ -21,18 +21,12 @@ class AddTwo(object):
         # Hint:  You'll want to look at tf.placeholder and sess.run.
 
         # START YOUR CODE
-        #self.graph = tf.Graph()
-        self.x0 = tf.placeholder(tf.float32)
-        self.y0 = tf.placeholder(tf.float32)
-
-        
+        pass
         # END YOUR CODE
 
     def Add(self, x, y):
         # START YOUR CODE
-        with tf.Session() as sess:
-            r = tf.add(self.x0, self.y0)
-            return sess.run(r, feed_dict={self.x0: x, self.y0: y}) 
+        pass
         # END YOUR CODE
 
 def affine_layer(hidden_dim, x, seed=0):
@@ -42,7 +36,6 @@ def affine_layer(hidden_dim, x, seed=0):
 
     # START YOUR CODE
     pass
-    #X_ = tf.placeholder(tf.float32, shape=[None, hidden_dim], name="X")
     # END YOUR CODE
 
 def fully_connected_layers(hidden_dims, x):
