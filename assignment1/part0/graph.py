@@ -22,8 +22,8 @@ class AddTwo(object):
 
         # START YOUR CODE
         #self.graph = tf.Graph()
-        self.x0 = tf.placeholder(tf.float32)
-        self.y0 = tf.placeholder(tf.float32)
+        self.x0 = tf.placeholder(tf.float32, None)
+        self.y0 = tf.placeholder(tf.float32, None)
 
         
         # END YOUR CODE
