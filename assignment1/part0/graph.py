@@ -21,7 +21,8 @@ class AddTwo(object):
         # Hint:  You'll want to look at tf.placeholder and sess.run.
 
         # START YOUR CODE
-        #self.graph = tf.Graph()
+        self.graph = tf.Graph()
+        self.sess = tf.Session()
         self.x0 = tf.placeholder(tf.float32, None)
         self.y0 = tf.placeholder(tf.float32, None)
 
@@ -30,9 +31,8 @@ class AddTwo(object):
 
     def Add(self, x, y):
         # START YOUR CODE
-        with tf.Session() as sess:
-            r = tf.add(self.x0, self.y0)
-            return sess.run(r, feed_dict={self.x0: x, self.y0: y}) 
+        r = tf.add(self.x0, self.y0)
+        return(self.sess.run(r, feed_dict={self.x0: x, self.y0: y})) 
         # END YOUR CODE
 
 def affine_layer(hidden_dim, x, seed=0):
@@ -41,8 +41,19 @@ def affine_layer(hidden_dim, x, seed=0):
     # seed: use this seed for xavier initialization.
 
     # START YOUR CODE
-    pass
-    #X_ = tf.placeholder(tf.float32, shape=[None, hidden_dim], name="X")
+    np.random.seed(seed)
+    
+    b_size = x.get_shape()[0]
+    f_size = x.get_shape()[1]
+    
+    #print x.get_shape(), b_size, f_size, hidden_dim
+
+    W = tf.get_variable(name = "W", shape=[f_size, hidden_dim], initializer=tf.contrib.layers.xavier_initializer())
+    b = tf.Variable(tf.zeros(hidden_dim), dtype=tf.float32, name="b")
+    z = tf.matmul(x, W) + b
+    print z.get_shape()
+    
+    return(z)
     # END YOUR CODE
 
 def fully_connected_layers(hidden_dims, x):
