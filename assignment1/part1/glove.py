@@ -10,14 +10,21 @@ def wordids_to_tensors(wordids, embedding_dim, vocab_size, seed=0):
     the corresponding embedding vector and bias in the table.
 
     Args:
-      - wordids |W|: a tensor of wordids
-      - embedding_dim, E: a scalar value of the # of dimensions in which to embed words
+      - wordids |IDs|: a tensor of wordids
+      - embedding_dim, |E|: a scalar value of the # of dimensions in which to embed words
       - vocab_size |V|: # of terms in the vocabulary
 
     Returns:
-      - a tuple (w, b, m) where w is a tensor of word embeddings and b is a vector
-        of biases.  w is |W x E| and b is |W|.  m is the full |V x E| embedding matrix.
-        Each of these should contain values of type tf.float32.
+      A tuple (ws, bs, m), all with tf.float32s:
+        - ws |IDs x E| is a tensor of word embeddings
+        - bs |IDs| is a vector of biases.
+        - m |V x E| is the full embedding matrix (from which you looked up ws)
+          (we don't strictly need this, but it comes in handy in the "Play!" section.)
+
+    HINT: To get the tests to pass, initialize w with a random_uniform [-1, 1] using
+          the provided seed.  As usual the "b" vector should be initialized to 0.
+
+    HINT: Look at tf.embedding_lookup(.).
     '''
     # START YOUR CODE
     pass
