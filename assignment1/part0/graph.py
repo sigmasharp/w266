@@ -41,19 +41,19 @@ def affine_layer(hidden_dim, x, seed=0):
     # seed: use this seed for xavier initialization.
 
     # START YOUR CODE
-    np.random.seed(seed)
+    #np.random.seed([seed])
     
     b_size = x.get_shape()[0]
     f_size = x.get_shape()[1]
     
     #print x.get_shape(), b_size, f_size, hidden_dim
+    #W = tf.Variable(tf.zeros([f_size, hidden_dim]), dtype=tf.float32, name="W")
 
-    W = tf.get_variable(name = "W", shape=[f_size, hidden_dim], initializer=tf.contrib.layers.xavier_initializer())
-    b = tf.Variable(tf.zeros(hidden_dim), dtype=tf.float32, name="b")
-    z = tf.matmul(x, W) + b
-    print z.get_shape()
-    
-    return(z)
+    W = tf.get_variable(name = "W", shape=[f_size, hidden_dim], initializer=tf.contrib.layers.xavier_initializer(seed=seed))
+
+    b = tf.Variable(tf.zeros([hidden_dim]), dtype=tf.float32, name="b")
+
+    return(tf.matmul(x, W) + b)
     # END YOUR CODE
 
 def fully_connected_layers(hidden_dims, x):
@@ -67,7 +67,12 @@ def fully_connected_layers(hidden_dims, x):
     #       your answer here only be a couple of lines long (mine is 4).
 
     # START YOUR CODE
-    pass
+    z = tf.nn.relu(affine_layer(hidden_dims[0], x))
+    for i in hidden_dims[1:]:
+        with tf.variable_scope("scope"+str(i)):
+            z = tf.nn.relu(affine_layer(i, z))
+    return(z)
+        
     # END YOUR CODE
 
 def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,

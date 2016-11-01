@@ -24,9 +24,8 @@ class TestLayer(tf.test.TestCase):
         with self.test_session() as sess:
             x = tf.placeholder(tf.float32, shape=[None, 3])
             z = graph.affine_layer(10, x)
-            print z.get_shape()[-1]
             self.assertAllEqual(10, z.get_shape()[-1])
-            print "pass 1"
+
             x_val = np.array([[3., 2., 1.]])
             sess.run(tf.initialize_all_variables())
             z_val = sess.run(z, feed_dict={x: x_val})
@@ -55,6 +54,11 @@ class TestNN(unittest.TestCase):
         X_train, y_train, X_test, y_test = generate_data(1000, 10)
         y_model = graph.train_nn(X_train, y_train, X_test,
                 [], 50, 2000, 0.001)
+
+    def test_train_nn_with_fclayers(self):
+        X_train, y_train, X_test, y_test = generate_data(1000, 10)
+        y_model = graph.train_nn(X_train, y_train, X_test,
+                [10, 22, 37], 50, 2000, 0.001)
 
 
 def generate_data(num_train, num_test):
@@ -92,3 +96,7 @@ def generate_non_linear_data(num_train, num_test):
     y = y[shuf_idx]
 
     return X[:num_train], y[:num_train], X[num_train:], y[num_train:]
+
+
+if __name__ == '__main__':
+    unittest.main()
