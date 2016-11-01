@@ -107,7 +107,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     #        Double check your code works for 0..n affine-nonlinears.
     #
     # START YOUR CODE
-    pass
+    loss = 0.0
 
     # END YOUR CODE
 
