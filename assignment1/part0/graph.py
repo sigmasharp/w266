@@ -20,41 +20,38 @@ class AddTwo(object):
         #
         # Hint:  You'll want to look at tf.placeholder and sess.run.
 
-        # START YOUR CODE
+        ###### START MY CODE
+        
         self.graph = tf.Graph()
         self.sess = tf.Session()
-        self.x0 = tf.placeholder(tf.float32, None)
-        self.y0 = tf.placeholder(tf.float32, None)
-
+        self.x = tf.placeholder(tf.float32, None)
+        self.y = tf.placeholder(tf.float32, None)
         
-        # END YOUR CODE
+        ###### END MY CODE
 
     def Add(self, x, y):
-        # START YOUR CODE
-        r = tf.add(self.x0, self.y0)
-        return(self.sess.run(r, feed_dict={self.x0: x, self.y0: y})) 
-        # END YOUR CODE
+        ###### START MY CODE
+        
+        return(self.sess.run(tf.add(self.x, self.y), feed_dict={self.x: x, self.y: y})) 
+        
+        ###### END MY CODE
 
 def affine_layer(hidden_dim, x, seed=0):
     # x: a [batch_size x # features] shaped tensor.
     # hidden_dim: a scalar representing the # of nodes.
     # seed: use this seed for xavier initialization.
 
-    # START YOUR CODE
-    #np.random.seed([seed])
+    ###### START MY CODE
+        
+    feature_size = x.get_shape()[1]
     
-    b_size = x.get_shape()[0]
-    f_size = x.get_shape()[1]
-    
-    #print x.get_shape(), b_size, f_size, hidden_dim
-    #W = tf.Variable(tf.zeros([f_size, hidden_dim]), dtype=tf.float32, name="W")
-
-    W = tf.get_variable(name = "W", shape=[f_size, hidden_dim], initializer=tf.contrib.layers.xavier_initializer(seed=seed))
+    W = tf.get_variable(name = "W", shape=[feature_size, hidden_dim], initializer=tf.contrib.layers.xavier_initializer(seed=seed))
 
     b = tf.Variable(tf.zeros([hidden_dim]), dtype=tf.float32, name="b")
 
     return(tf.matmul(x, W) + b)
-    # END YOUR CODE
+        
+    ###### END MY CODE
 
 def fully_connected_layers(hidden_dims, x):
     # hidden_dims: A list of the width of the hidden layer.
@@ -66,14 +63,18 @@ def fully_connected_layers(hidden_dims, x):
     # Hint: a fully connected layer is a nonlinearity of an affine of its input.
     #       your answer here only be a couple of lines long (mine is 4).
 
-    # START YOUR CODE
-    z = tf.nn.relu(affine_layer(1 if len(hidden_dims)==0 else hidden_dims[0], x))
+    ###### START MY CODE
+    
+    with tf.variable_scope("scope0"):
+        id, z = 1, tf.nn.relu(affine_layer(1 if len(hidden_dims)==0 else hidden_dims[0], x))
+    
     for i in hidden_dims[1:]:
-        with tf.variable_scope("scope"+str(i)):
-            z = tf.nn.relu(affine_layer(i, z))
+        with tf.variable_scope("scope"+str(id)):
+            id, z = id+1, tf.nn.relu(affine_layer(i, z))
+    
     return(z)
         
-    # END YOUR CODE
+    ###### END MY CODE
 
 def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
              verbose=False):
@@ -91,9 +92,8 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     tf.reset_default_graph()
     x_ph = tf.placeholder(tf.float32, shape=[None, X.shape[-1]])
     y_ph = tf.placeholder(tf.float32, shape=[None])
-    #global_step = tf.Variable(0, trainable=False)
-    global_step = 0
-
+    global_step = tf.Variable(0, trainable=False)
+    #global_step = 0
     # Construct the neural network, store the batch loss in a variable called `loss`.
     # At the end of this block, you'll want to have these ops:
     # - y_hat: probability of the positive class
@@ -107,21 +107,21 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     #        <affine-nonlinear>* -> affine -> sigmoid -> y_hat
     #        Double check your code works for 0..n affine-nonlinears.
     #
-    # START YOUR CODE
+    ###### START MY CODE
     
-    y_hat = tf.squeeze(tf.sigmoid(fully_connected_layers(hidden_dims, x_ph)))
+    y_hat = tf.sigmoid(affine_layer(1, fully_connected_layers(hidden_dims, x_ph)))
     
-    loss = tf.reduce_mean(tf.squeeze(tf.nn.sigmoid_cross_entropy_with_logits(y_hat, y_ph, name="loss")))
+    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(tf.squeeze(y_hat), y_ph, name="loss"))
 
     
 
     alpha = tf.placeholder(tf.float32, name="learning_rate")
     optimizer = tf.train.GradientDescentOptimizer(alpha)
-    train_step = optimizer.minimize(loss)
+    train_step = optimizer.minimize(loss, global_step=global_step)
         
     init = tf.initialize_all_variables()
     
-    # END YOUR CODE
+    ###### END MY CODE
 
 
     # Output some initial statistics.
@@ -135,7 +135,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
           print 'Variable: ', var.name, var.get_shape()
           print 'dJ/dVar: ', sess.run(
                   tf.gradients(loss, var), feed_dict={x_ph: X, y_ph: y})
-    #print num_epochs
+    
     for epoch_num in xrange(num_epochs):
         for batch in xrange(0, X.shape[0], batch_size):
             X_batch = X[batch : batch + batch_size]
@@ -149,13 +149,12 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
             #y_pred = sess.run(y_hat, feed_dict={x_ph: X_batch, y_ph: y_batch})
 
             # Run a single gradient descent step
-            pro, loss_value, _ = sess.run([y_hat, loss, train_step], feed_dict={x_ph: X_batch, y_ph: y_batch, alpha: learning_rate})
-            global_step = global_step + 1
-           
+            pro, loss_value, global_step_value, _ = sess.run([y_hat, loss, global_step, train_step], feed_dict={x_ph: X_batch, y_ph: y_batch, alpha: learning_rate})
+
 
             # END YOUR CODE
         if epoch_num % 300 == 0:
-            print 'Step: ', global_step, 'Loss:', loss_value
+            print 'Step: ', global_step_value, 'Loss:', loss_value
             if verbose:
               for var in tf.trainable_variables():
                   print var.name, sess.run(var)
@@ -164,6 +163,9 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     # Return your predictions.
     # START YOUR CODE
     # plug in X_test
- 
-    return sess.run(y_hat, feed_dict={x_ph:X_test})>=0.5
+    r = sess.run(y_hat, feed_dict={x_ph:X_test})>=0.5
+    
+    r = [int(s) for s in r]
+    
+    return r
     # END YOUR CODE
