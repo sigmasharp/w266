@@ -67,6 +67,8 @@ def fully_connected_layers(hidden_dims, x):
     #       your answer here only be a couple of lines long (mine is 4).
 
     # START YOUR CODE
+    if len(hidden_dims) == 0:
+        return(affine_layer(1, x))
     z = tf.nn.relu(affine_layer(hidden_dims[0], x))
     for i in hidden_dims[1:]:
         with tf.variable_scope("scope"+str(i)):
@@ -82,7 +84,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     # prediction and the label.
     # Return the predictions for X_test.
     # X: train features
-    # Y: train labels
+    # y: train labels
     # X_test: test features
     # hidden_dims: same as in fully_connected_layers
     # learning_rate: the learning rate for your GradientDescentOptimizer.
@@ -107,15 +109,26 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     #        Double check your code works for 0..n affine-nonlinears.
     #
     # START YOUR CODE
-    loss = 0.0
+    logits = fully_connected_layers(hidden_dims, x_ph)
+    y_hat = tf.sigmoid(logits)
+    
+    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits, y_hat, name="loss"))
+    
 
+    alpha = learning_rate
+    optimizer = tf.train.GradientDescentOptimizer(alpha)
+    train_step = optimizer.minimize(loss)
+        
+    init = tf.initialize_all_variables()
+    #with tf.variable_scope("here"):
+    #    y_pred = tf.sigmoid(fully_connected_layers(hidden_dims, x_ph)) >= 0.5
     # END YOUR CODE
 
 
     # Output some initial statistics.
     # You should see about a 0.6 initial loss (-ln 2).
     sess = tf.Session(config=tf.ConfigProto(device_filters="/cpu:0"))
-    sess.run(tf.initialize_all_variables())
+    sess.run(init)
     print 'Initial loss:', sess.run(loss, feed_dict={x_ph: X, y_ph: y})
 
     if verbose:
@@ -128,16 +141,22 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
         for batch in xrange(0, X.shape[0], batch_size):
             X_batch = X[batch : batch + batch_size]
             y_batch = y[batch : batch + batch_size]
-
             # Feed a batch to your network using sess.run.
             # Populate loss_value with the current value of loss.
             # Populate global_value with the current value of global_step.
             # You'll also want to run your training op.
             # START YOUR CODE
-            pass
+            
+            #y_pred = sess.run(y_hat, feed_dict={x_ph: X_batch, y_ph: y_batch})
+
+            # Run a single gradient descent step
+            loss_value, y_prob, _ = sess.run([loss, y_hat, train_step], feed_dict={x_ph: X, y_ph: y})
+            global_step += 1
+           
+
             # END YOUR CODE
         if epoch_num % 300 == 0:
-            print 'Step: ', global_step_value, 'Loss:', loss_value
+            print 'Step: ', global_step, 'Loss:', loss_value
             if verbose:
               for var in tf.trainable_variables():
                   print var.name, sess.run(var)
@@ -145,5 +164,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
 
     # Return your predictions.
     # START YOUR CODE
-    pass
+    # plug in X_test
+    #y_pred = session.run(y_hat, 
+    return sess.run(y_pred)
     # END YOUR CODE
