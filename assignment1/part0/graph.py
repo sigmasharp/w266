@@ -67,9 +67,7 @@ def fully_connected_layers(hidden_dims, x):
     #       your answer here only be a couple of lines long (mine is 4).
 
     # START YOUR CODE
-    if len(hidden_dims) == 0:
-        return(affine_layer(1, x))
-    z = tf.nn.relu(affine_layer(hidden_dims[0], x))
+    z = tf.nn.relu(affine_layer(1 if len(hidden_dims)==0 else hidden_dims[0], x))
     for i in hidden_dims[1:]:
         with tf.variable_scope("scope"+str(i)):
             z = tf.nn.relu(affine_layer(i, z))
@@ -93,7 +91,8 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     tf.reset_default_graph()
     x_ph = tf.placeholder(tf.float32, shape=[None, X.shape[-1]])
     y_ph = tf.placeholder(tf.float32, shape=[None])
-    global_step = tf.Variable(0, trainable=False)
+    #global_step = tf.Variable(0, trainable=False)
+    global_step = 0
 
     # Construct the neural network, store the batch loss in a variable called `loss`.
     # At the end of this block, you'll want to have these ops:
@@ -109,19 +108,19 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     #        Double check your code works for 0..n affine-nonlinears.
     #
     # START YOUR CODE
-    logits = fully_connected_layers(hidden_dims, x_ph)
-    y_hat = tf.sigmoid(logits)
     
-    loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits, y_hat, name="loss"))
+    y_hat = tf.squeeze(tf.sigmoid(fully_connected_layers(hidden_dims, x_ph)))
+    
+    loss = tf.reduce_mean(tf.squeeze(tf.nn.sigmoid_cross_entropy_with_logits(y_hat, y_ph, name="loss")))
+
     
 
-    alpha = learning_rate
+    alpha = tf.placeholder(tf.float32, name="learning_rate")
     optimizer = tf.train.GradientDescentOptimizer(alpha)
     train_step = optimizer.minimize(loss)
         
     init = tf.initialize_all_variables()
-    #with tf.variable_scope("here"):
-    #    y_pred = tf.sigmoid(fully_connected_layers(hidden_dims, x_ph)) >= 0.5
+    
     # END YOUR CODE
 
 
@@ -136,7 +135,7 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
           print 'Variable: ', var.name, var.get_shape()
           print 'dJ/dVar: ', sess.run(
                   tf.gradients(loss, var), feed_dict={x_ph: X, y_ph: y})
-
+    #print num_epochs
     for epoch_num in xrange(num_epochs):
         for batch in xrange(0, X.shape[0], batch_size):
             X_batch = X[batch : batch + batch_size]
@@ -150,8 +149,8 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
             #y_pred = sess.run(y_hat, feed_dict={x_ph: X_batch, y_ph: y_batch})
 
             # Run a single gradient descent step
-            loss_value, y_prob, _ = sess.run([loss, y_hat, train_step], feed_dict={x_ph: X, y_ph: y})
-            global_step += 1
+            pro, loss_value, _ = sess.run([y_hat, loss, train_step], feed_dict={x_ph: X_batch, y_ph: y_batch, alpha: learning_rate})
+            global_step = global_step + 1
            
 
             # END YOUR CODE
@@ -165,6 +164,6 @@ def train_nn(X, y, X_test, hidden_dims, batch_size, num_epochs, learning_rate,
     # Return your predictions.
     # START YOUR CODE
     # plug in X_test
-    #y_pred = session.run(y_hat, 
-    return sess.run(y_pred)
+ 
+    return sess.run(y_hat, feed_dict={x_ph:X_test})>=0.5
     # END YOUR CODE
