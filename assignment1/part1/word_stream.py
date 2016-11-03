@@ -8,7 +8,11 @@ def context_windows(words, C=5):
          yield the_next_window
     '''
     # START YOUR CODE HERE
-    pass
+    cw = []
+    for i in range(len(words)-C+1):
+        cw.append(words[i:i+C])
+        
+    return cw    
     # END YOUR CODE HERE
 
 
@@ -27,10 +31,16 @@ def cooccurrence_table(words, C=2):
     '''
     table = []
     # START YOUR CODE HERE
+    
+    for i in range(C, len(words)-C):
+        for j in range(-C,C+1):
+            if j != 0:
+                table.append((words[i], words[i+j], 1.0/abs(j)))
+                
     # END YOUR CODE HERE
     return table
 
-
+ 
 def score_bigram(bigram, unigram_counts, bigram_counts, delta):
     '''Return the score of bigram.
     See Section 4 of Word2Vec (see notebook for link).
@@ -42,5 +52,9 @@ def score_bigram(bigram, unigram_counts, bigram_counts, delta):
       - delta: the adjustment factor
     '''
     # START YOUR CODE HERE
-    pass
+    b = bigram_counts.get((bigram[0], bigram[1]),0.0)
+    if b==0.0:
+        return 0.0
+    
+    return (bigram_counts.get((bigram[0], bigram[1]),0.0) - delta)*1.0/(unigram_counts.get(bigram[0], 1.0)*unigram_counts.get(bigram[1],1.0))
     # END YOUR CODE HERE
