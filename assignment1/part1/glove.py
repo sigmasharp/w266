@@ -27,12 +27,15 @@ def wordids_to_tensors(wordids, embedding_dim, vocab_size, seed=0):
     HINT: Look at tf.embedding_lookup(.).
     '''
     # START YOUR CODE
+    # tf.reset_default_graph
     # IDs = wordids.get_shape()[0]
     # print IDs
     E = embedding_dim
     V = vocab_size
-    ws = tf.Variable(tf.random_uniform([wordids.get_shape()[0], E] , minval=-1.0, maxval=1.0, dtype=tf.float32, seed=seed, name="ws"))
-    bs = tf.Variable(tf.zeros(wordids.get_shape()[0]), dtype=tf.float32, name="b")
+    sh = [wordids.get_shape()[0], E]
+    #ws = tf.random_uniform([wordids.get_shape()[0], [E]] , minval=-1.0, maxval=1.0, dtype=tf.float32, seed=seed)
+    ws = tf.Variable(tf.random_uniform(sh, [E]), minval=-1.0, maxval=1.0, dtype=tf.float32, seed=seed), validate_shape=False, name="ws")
+    bs = tf.Variable(tf.zeros(wordids.get_shape()), dtype=tf.float32, validate_shape=False, name="b")
     m  = tf.nn.embedding_lookup(params=(ws), ids=wordids, name="m")
     return (ws, bs, m)
     # END YOUR CODE
