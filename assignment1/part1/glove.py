@@ -76,5 +76,11 @@ def loss(w, b, w_c, b_c, c):
       - loss |batch_size|: the loss of each example in the batch
     '''
     # START YOUR CODE
-    pass
+    # i will use equation 8 and 16 = f(x_ij) * (wT_i * wc_j + b_i + bc_j - log(x_ij))^2
+    # where x_ij = cj
+    # cost or loss = sum over j from 1 to E of example_weight(cj)*(wTi * wcj + bi + bcj - log(cj))^2
+    # also, I took the default cutoff x_max = 100 and alpha to be 0.75
+    
+    return example_weight(c, 100, 0.75)*tf.pow(tf.add_n([tf.reduce_sum(tf.mul(w, w_c), 1), b, b_c, -tf.log(c)]),2)
+    
     # END YOUR CODE
