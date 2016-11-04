@@ -33,8 +33,9 @@ def wordids_to_tensors(wordids, embedding_dim, vocab_size, seed=0):
     E = embedding_dim
     V = vocab_size
     sh = [wordids.get_shape()[0], E]
+    print sh
     #ws = tf.random_uniform([wordids.get_shape()[0], [E]] , minval=-1.0, maxval=1.0, dtype=tf.float32, seed=seed)
-    ws = tf.Variable(tf.random_uniform(sh, [E]), minval=-1.0, maxval=1.0, dtype=tf.float32, seed=seed), validate_shape=False, name="ws")
+    ws = tf.Variable(tf.random_uniform(sh, minval=-1.0, maxval=1.0, seed=seed), validate_shape=False, name="ws")
     bs = tf.Variable(tf.zeros(wordids.get_shape()), dtype=tf.float32, validate_shape=False, name="b")
     m  = tf.nn.embedding_lookup(params=(ws), ids=wordids, name="m")
     return (ws, bs, m)

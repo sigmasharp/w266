@@ -52,7 +52,7 @@ def score_bigram(bigram, unigram_counts, bigram_counts, delta):
       - delta: the adjustment factor
     '''
     # START YOUR CODE HERE
-    b = bigram_counts.get((bigram[0], bigram[1]),0.0)
+    b = bigram_counts.get((bigram[0], bigram[1]),0.0) #0.0 is the default in case there is no bigram indexed
     if b==0.0:
         return 0.0
     
