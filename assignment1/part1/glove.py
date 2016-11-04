@@ -21,7 +21,7 @@ def wordids_to_tensors(wordids, embedding_dim, vocab_size, seed=0):
         - m |V x E| is the full embedding matrix (from which you looked up ws)
           (we don't strictly need this, but it comes in handy in the "Play!" section.)
 
-    HINT: To get the tests to pass, initialize w with a random_uniform [-1, 1] using
+    HINT: To get the tests to pass, initialize m with a random_uniform [-1, 1] using
           the provided seed.  As usual the "b" vector should be initialized to 0.
 
     HINT: Look at tf.embedding_lookup(.).
@@ -32,12 +32,13 @@ def wordids_to_tensors(wordids, embedding_dim, vocab_size, seed=0):
     # print IDs
     E = embedding_dim
     V = vocab_size
-    sh = [wordids.get_shape()[0], E]
-    print sh
+
     #ws = tf.random_uniform([wordids.get_shape()[0], [E]] , minval=-1.0, maxval=1.0, dtype=tf.float32, seed=seed)
-    ws = tf.Variable(tf.random_uniform(sh, minval=-1.0, maxval=1.0, seed=seed), validate_shape=False, name="ws")
-    bs = tf.Variable(tf.zeros(wordids.get_shape()), dtype=tf.float32, validate_shape=False, name="b")
-    m  = tf.nn.embedding_lookup(params=(ws), ids=wordids, name="m")
+    
+    m = tf.Variable(tf.random_uniform([V, E], minval=-1.0, maxval=1.0, seed=seed), name="ws")
+    b = tf.Variable(tf.zeros(V), dtype=tf.float32, name="b")
+    ws = tf.nn.embedding_lookup(params=(m), ids=wordids, name="ws")
+    bs = tf.nn.embedding_lookup(params=(b), ids=wordids, name="bs")
     return (ws, bs, m)
     # END YOUR CODE
 
