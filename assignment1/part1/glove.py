@@ -58,7 +58,7 @@ def example_weight(Xij, x_max, alpha):
       - A vector of corresponding weights.
     '''
     # START YOUR CODE
-    pass
+    return tf.select(Xij < x_max, tf.pow(Xij/x_max, alpha), Xij-Xij+1.0)
     # END YOUR CODE
 
 
