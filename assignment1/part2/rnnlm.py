@@ -77,10 +77,12 @@ class RNNLM(object):
     """Construct the core RNNLM graph, needed for any use of the model.
 
     This should include:
-    - Placeholders for input tensors (input_w, initial_h, target_y)
+    - Placeholders for input tensors (input_w_, initial_h_, target_y_)
     - Variables for model parameters
     - Tensors representing various intermediate states
-    - A Tensor for the output logits (logits_)
+    - A Tensor for the final state (final_h_)
+    - A Tensor for the output logits (logits_), i.e. the un-normalized argument
+      of the softmax(...) function in the output layer.
     - A scalar loss function (loss_)
 
     Your loss function should return a *scalar* value that represents the
@@ -90,9 +92,9 @@ class RNNLM(object):
     You shouldn't include training or sampling functions here; you'll do this
     in BuildTrainGraph and BuildSampleGraph below.
 
-    We give you some starter definitions for input_w_ and target_y_, as well 
-    as a few other tensors that might help. We've also added dummy values for 
-    initial_h_, logits_, and loss_ - you should re-define these in your code as 
+    We give you some starter definitions for input_w_ and target_y_, as well
+    as a few other tensors that might help. We've also added dummy values for
+    initial_h_, logits_, and loss_ - you should re-define these in your code as
     the appropriate tensors. See the in-line comments for more detail.
     """
     # Input ids, with dynamic shape depending on input.
@@ -102,6 +104,11 @@ class RNNLM(object):
     # Initial hidden state. You'll need to overwrite this with cell.zero_state
     # once you construct your RNN cell.
     self.initial_h_ = None
+
+    # Final hidden state. You'll need to overwrite this with the output from
+    # tf.nn.dynamic_rnn so that you can pass it in to the next batch (if
+    # applicable).
+    self.final_h_ = None
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
@@ -130,7 +137,7 @@ class RNNLM(object):
 
     # Construct embedding layer
 
-    # Construct RNN/LSTM cell and recurrent layer
+    # Construct RNN/LSTM cell and recurrent layer (hint: use tf.nn.dynamic_rnn)
 
 
 
