@@ -1,0 +1,13 @@
+﻿another trial
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# You are currently reverting commit 67eb8b8.
+#
+# Changes to be committed:
+#	modified:   assignment1/part2/part2-rnnlm.ipynb
+#	deleted:    assignment1/part2/part2-rnnlm.pdf
+#
+
