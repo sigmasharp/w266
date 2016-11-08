@@ -103,12 +103,12 @@ class RNNLM(object):
 
     # Initial hidden state. You'll need to overwrite this with cell.zero_state
     # once you construct your RNN cell.
-    self.initial_h_ = None
+    self.initial_h_ = tf.Variable(tf.zeros(H))
 
     # Final hidden state. You'll need to overwrite this with the output from
     # tf.nn.dynamic_rnn so that you can pass it in to the next batch (if
     # applicable).
-    self.final_h_ = None
+    self.final_h_ = tf.nn.dynami_rnn(self.inital_h, input_w)
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
@@ -136,15 +136,17 @@ class RNNLM(object):
     #### YOUR CODE HERE ####
 
     # Construct embedding layer
+    # from V x H to H
 
     # Construct RNN/LSTM cell and recurrent layer (hint: use tf.nn.dynamic_rnn)
-
+    # from 2*H to H
 
 
     # Softmax output layer, over vocabulary
     # Hint: use the matmul3d() helper here.
 
     # Loss computation (true loss, for prediction)
+    
 
     #### END(YOUR CODE) ####
 
