@@ -109,10 +109,11 @@ class RNNLM(object):
     # tf.nn.dynamic_rnn so that you can pass it in to the next batch (if
     # applicable).
     #tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
-    self.final_h_ = tf.nn.dynamic_rnn(self.cell, inputs=input_w, sequence_length=inital_state=self.inital_h, )
+    self.final_h_ = tf.nn.dynamic_rnn(self.cell, inputs=input_w, sequence_length=inital_state=self.inital_h)
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
+    # logits = o (or h) x Wout + b
     self.logits_ = None
 
     # Should be the same shape as inputs_w_
