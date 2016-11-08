@@ -103,12 +103,13 @@ class RNNLM(object):
 
     # Initial hidden state. You'll need to overwrite this with cell.zero_state
     # once you construct your RNN cell.
-    self.initial_h_ = tf.Variable(tf.zeros(H))
+    self.initial_h_ = tf.Variable(tf.zeros(H), dtype=tf.float32)
 
     # Final hidden state. You'll need to overwrite this with the output from
     # tf.nn.dynamic_rnn so that you can pass it in to the next batch (if
     # applicable).
-    self.final_h_ = tf.nn.dynami_rnn(self.inital_h, input_w)
+    #tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
+    self.final_h_ = tf.nn.dynamic_rnn(self.cell, inputs=input_w, sequence_length=inital_state=self.inital_h, )
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
@@ -140,7 +141,7 @@ class RNNLM(object):
 
     # Construct RNN/LSTM cell and recurrent layer (hint: use tf.nn.dynamic_rnn)
     # from 2*H to H
-
+    slef.cell = MakeFancyRNNCell(self.H, keep_prob, self.num_layers)
 
     # Softmax output layer, over vocabulary
     # Hint: use the matmul3d() helper here.
