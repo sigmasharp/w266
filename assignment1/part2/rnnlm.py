@@ -61,7 +61,7 @@ class RNNLM(object):
     # Model structure; these need to be fixed for a given model.
     self.V = V
     self.H = H
-    self.num_layers = 1
+    self.num_layers = num_layers #took out the 1 and replaced it with num_layers
 
     # Training hyperparameters; these can be changed with feed_dict,
     # and you may want to do so during training.
@@ -72,6 +72,9 @@ class RNNLM(object):
       # Due to a bug in TensorFlow, this needs to be an ordinary python
       # constant instead of a tf.constant.
       self.max_grad_norm_ = 5.0
+    # ==>
+    # data members: all by 'self.' prefix and all are hyper parameters for the learning for the model
+    # V, H, num_layers, learning_rate_, dropout_keep_prob_, max_grad_norm_
 
   def BuildCoreGraph(self):
     """Construct the core RNNLM graph, needed for any use of the model.
@@ -103,24 +106,29 @@ class RNNLM(object):
 
     # Initial hidden state. You'll need to overwrite this with cell.zero_state
     # once you construct your RNN cell.
-    self.initial_h_ = tf.Variable(tf.zeros(H), dtype=tf.float32)
+    
+    # ==> "ONCE?"=> when
+    self.initial_h_ = tf.placeholder(tf.float32, [None, None, self.H], name="initial_h")
 
     # Final hidden state. You'll need to overwrite this with the output from
     # tf.nn.dynamic_rnn so that you can pass it in to the next batch (if
     # applicable).
-    #tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
-    self.final_h_ = tf.nn.dynamic_rnn(self.cell, inputs=input_w, sequence_length=inital_state=self.inital_h)
+    
+    # ==> the variable
+    self.final_h_ = tf.placeholder(dtype = tf.float32, [None, None, self.H], name = "final_h")
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
-    # logits = o (or h) x Wout + b
-    self.logits_ = None
+    
+    # =>=>=>
+    # logits = o (or h) x Wout + b, where o is of size 1xH, Wout is HxV or Hxk, and b is V
+    self.logits_ = tf.placeholder(dtype = tf.float32, [None, None, self.H], name = "logits")
 
     # Should be the same shape as inputs_w_
     self.target_y_ = tf.placeholder(tf.int32, [None, None], name="y")
 
     # Replace this with an actual loss function
-    self.loss_ = None
+    self.loss_ = tf.reduced_sum(tf.nn.softmax(self.logits_, dim=-1, name=None))
 
     # Get dynamic shape info from inputs
     with tf.name_scope("batch_size"):
@@ -139,14 +147,24 @@ class RNNLM(object):
 
     # Construct embedding layer
     # from V x H to H
+    self.em_mat_ = tf.Variable(tf.random_uniform([self.V, self.H], minval=-1.0, maxval=1.0, seed=seed), name="em_mat")
+    self.em_b = tf.Variable(tf.zeros(self.V), dtype=tf.float32, name="em_b")
+    self.em_lu = tf.nn.embedding_lookup(params=(self.em_mat), ids=input_w_, name="em_lu")
+    self.em_lu_b = tf.nn.embedding_lookup(params=(self.em_b), ids=input_w_, name="em_lu_b")
 
     # Construct RNN/LSTM cell and recurrent layer (hint: use tf.nn.dynamic_rnn)
     # from 2*H to H
-    slef.cell = MakeFancyRNNCell(self.H, keep_prob, self.num_layers)
+    self.cell_ = MakeFancyRNNCell(self.H, self.keep_prob, self.num_layers, name="cell")
+    
+    #=>tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
+    self.rnn_ = tf.nn.dynamic_rnn(self.cell_, inputs=input_w_, initial_stat=self.init_h_, name = "rnn")
 
     # Softmax output layer, over vocabulary
     # Hint: use the matmul3d() helper here.
-
+    
+    # => matmul3d(), [batch, max_time, H] x [H, V] 
+    self.output_ = 
+    
     # Loss computation (true loss, for prediction)
     
 
