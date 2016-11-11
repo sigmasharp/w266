@@ -159,7 +159,7 @@ class RNNLM(object):
     
     self.inital_h_ = tf.reshape(self.cell_.zero_state(self.batch_size_ * self.max_time_ * self.H, dtype=tf.float32), [self.batch_size_, self.max_time_, self.H])
     #=> tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
-    self.rnn_output_, self.final_h_ = tf.nn.dynamic_rnn(self.cell_, inputs=self.em_lu_, initial_state=(self.initial_h_, self.inital_h_), dtype=tf.float32)
+    self.rnn_output_, self.final_h_ = tf.nn.dynamic_rnn(self.cell_, inputs=self.em_lu_, initial_state=self.initial_h_, dtype=tf.float32)
 
     # Softmax output layer, over vocabulary
     # Hint: use the matmul3d() helper here.
@@ -168,7 +168,7 @@ class RNNLM(object):
 
     # => output = p^hat (w(i+1)) = softmax(o(i)Wout+bout)
     # => tf.nn.softmax(logits, name=None)
-    self.logits_ = tf.matmul(self.rnn_output_, self.Wout_) + self.bout
+    self.logits_ = tf.matmul3d(self.rnn_output_, self.Wout_) + self.bout
     self.output_ = tf.nn.softmax(self.logits, name="output")
     
     # Loss computation (true loss, for prediction)
