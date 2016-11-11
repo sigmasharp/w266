@@ -115,20 +115,21 @@ class RNNLM(object):
     # applicable).
     
     # ==> the variable
-    self.final_h_ = tf.placeholder(dtype = tf.float32, [None, None, self.H], name = "final_h")
+    self.final_h_ = tf.placeholder(tf.float32, [None, None, self.H], name = "final_h")
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
     
     # =>=>=>
     # logits = o (or h) x Wout + b, where o is of size 1xH, Wout is HxV or Hxk, and b is V
-    self.logits_ = tf.placeholder(dtype = tf.float32, [None, None, self.H], name = "logits")
+    self.logits_ = tf.placeholder(tf.float32, [None, None, self.H], name = "logits")
 
     # Should be the same shape as inputs_w_
     self.target_y_ = tf.placeholder(tf.int32, [None, None], name="y")
 
     # Replace this with an actual loss function
-    self.loss_ = tf.reduced_sum(tf.nn.softmax(self.logits_, dim=-1, name=None))
+    #self.loss_ = tf.reduced_sum(tf.nn.softmax(self.logits_, dim=-1, name=None))
+    self.loss_ = tf.placeholder(tf.int32, [None, None, self.H], name="loss")
 
     # Get dynamic shape info from inputs
     with tf.name_scope("batch_size"):
@@ -147,25 +148,32 @@ class RNNLM(object):
 
     # Construct embedding layer
     # from V x H to H
-    self.em_mat_ = tf.Variable(tf.random_uniform([self.V, self.H], minval=-1.0, maxval=1.0, seed=seed), name="em_mat")
-    self.em_b = tf.Variable(tf.zeros(self.V), dtype=tf.float32, name="em_b")
-    self.em_lu = tf.nn.embedding_lookup(params=(self.em_mat), ids=input_w_, name="em_lu")
-    self.em_lu_b = tf.nn.embedding_lookup(params=(self.em_b), ids=input_w_, name="em_lu_b")
+    self.em_mat_ = tf.Variable(tf.random_uniform([self.V, self.H], minval=-1.0, maxval=1.0, seed=0), name="em_mat")
+    self.em_b_ = tf.Variable(tf.zeros(self.V), dtype=tf.float32, name="em_b")
+    self.em_lu_ = tf.reshape(tf.nn.embedding_lookup(params=(self.em_mat_), ids=tf.reshape(self.input_w_, [-1])), [self.batch_size_, self.max_time_, self.H], name="em_lu")
+    self.em_lu_b = tf.reshape(tf.nn.embedding_lookup(params=(self.em_b_), ids=tf.reshape(self.input_w_, [-1])), [self.batch_size_, self.max_time_, self.H], name="em_lu_b")
 
     # Construct RNN/LSTM cell and recurrent layer (hint: use tf.nn.dynamic_rnn)
     # from 2*H to H
-    self.cell_ = MakeFancyRNNCell(self.H, self.keep_prob, self.num_layers, name="cell")
+    self.cell_ = MakeFancyRNNCell(self.H, self.dropout_keep_prob_, self.num_layers)
     
-    #=>tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
-    self.rnn_ = tf.nn.dynamic_rnn(self.cell_, inputs=input_w_, initial_stat=self.init_h_, name = "rnn")
+    self.inital_h_ = tf.reshape(self.cell_.zero_state(self.batch_size_ * self.max_time_ * self.H, dtype=tf.float32), [self.batch_size_, self.max_time_, self.H])
+    #=> tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
+    self.rnn_output_, self.final_h_ = tf.nn.dynamic_rnn(self.cell_, inputs=self.em_lu_, initial_state=(self.initial_h_, self.inital_h_), dtype=tf.float32)
 
     # Softmax output layer, over vocabulary
     # Hint: use the matmul3d() helper here.
     
-    # => matmul3d(), [batch, max_time, H] x [H, V] 
-    self.output_ = 
+    # => matmul3d(), [batch, max_time, H] x [H, V]
+
+    # => output = p^hat (w(i+1)) = softmax(o(i)Wout+bout)
+    # => tf.nn.softmax(logits, name=None)
+    self.logits_ = tf.matmul(self.rnn_output_, self.Wout_) + self.bout
+    self.output_ = tf.nn.softmax(self.logits, name="output")
     
     # Loss computation (true loss, for prediction)
+    # => tf.nn.softmax_cross_entropy_with_logits(logits, labels, name=None)
+    self.loss_ = tf.nn.softmax_cross_entropy_with_logits(self.logits, self.target_y, name = "loss")
     
 
     #### END(YOUR CODE) ####
