@@ -174,22 +174,10 @@ class RNNLM(object):
     self.bout_ = tf.Variable(tf.random_uniform([self.V], minval=-1.0, maxval=1.0, seed=0), name="bout")
     self.logits_ = matmul3d(self.rnn_output_, self.Wout_) + self.bout_
     self.output_ = tf.nn.softmax(self.logits_, name="output")
-    print self.logits_.get_shape()
-    print self.output_.get_shape()
-    print self.target_y_.get_shape()
-    #print self.initial_h_.get_shape()
-    print self.rnn_output_.get_shape()
     
     # Loss computation (true loss, for prediction)
     # => tf.nn.softmax_cross_entropy_with_logits(logits, labels, name=None)
-    self.loss_ = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(self.logits_, self.target_y_, name = "loss"))
-    #print self.loss_.get_shape()
-    #print self.input_w_.get_shape()
-    #print self.em_lu_.get_shape()
-    #print self.rnn_output_.get_shape()
-    #print self.logits_.get_shape()
-    #print self.loss_.get_shape()
-    
+    self.loss_ = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(self.logits_, self.target_y_, name = "loss"))    
 
     #### END(YOUR CODE) ####
 
@@ -242,7 +230,7 @@ class RNNLM(object):
 
     #### YOUR CODE HERE ####
 
-    self.pred_samples_ = tf.multinomial(tf.reshape(self.logits_, [-1, self.V]), 5000, name="pred_samples")
+    self.pred_samples_ = tf.reshape(tf.multinomial(tf.reshape(self.logits_, [-1, self.V]), 5000, name="pred_samples"), [-1, 1])
 
     #### END(YOUR CODE) ####
 
