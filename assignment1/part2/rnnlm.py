@@ -174,12 +174,20 @@ class RNNLM(object):
     self.bout_ = tf.Variable(tf.random_uniform([self.V], minval=-1.0, maxval=1.0, seed=0), name="bout")
     self.logits_ = matmul3d(self.rnn_output_, self.Wout_) + self.bout_
     self.output_ = tf.nn.softmax(self.logits_, name="output")
-    #print self.logits_.get_shape()
-    #print self.output_.get_shape()
+    print self.logits_.get_shape()
+    print self.output_.get_shape()
+    print self.target_y_.get_shape()
+    #print self.initial_h_.get_shape()
+    print self.rnn_output_.get_shape()
     
     # Loss computation (true loss, for prediction)
     # => tf.nn.softmax_cross_entropy_with_logits(logits, labels, name=None)
     self.loss_ = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(self.logits_, self.target_y_, name = "loss"))
+    #print self.loss_.get_shape()
+    #print self.input_w_.get_shape()
+    #print self.em_lu_.get_shape()
+    #print self.rnn_output_.get_shape()
+    #print self.logits_.get_shape()
     #print self.loss_.get_shape()
     
 
@@ -209,7 +217,7 @@ class RNNLM(object):
     with tf.name_scope("Train_Loss"):
       # Placeholder: replace with a sampled loss
       self.train_loss_ = tf.reduce_sum(tf.nn.sampled_softmax_loss(tf.transpose(self.Wout_), self.bout_, tf.reshape(self.rnn_output_, [-1, self.H]), labels=self.target_y_, num_sampled=5000, num_classes=self.V, num_true=5000, sampled_values=None, remove_accidental_hits=True, partition_strategy='mod', name='train_loss'))
-
+      
 
     # Define optimizer and training op
     with tf.name_scope("Training"):
