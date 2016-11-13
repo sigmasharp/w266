@@ -61,13 +61,15 @@ class RNNLM(object):
     # Model structure; these need to be fixed for a given model.
     self.V = V
     self.H = H
-    self.num_layers = num_layers #took out the 1 and replaced it with num_layers
+    self.num_layers = num_layers #*** took out the 1 and replaced it with num_layers
 
     # Training hyperparameters; these can be changed with feed_dict,
     # and you may want to do so during training.
     with tf.name_scope("Training_Parameters"):
       self.learning_rate_ = tf.constant(0.1, name="learning_rate")
-      self.dropout_keep_prob_ = tf.constant(0.5, name="dropout_keep_prob")
+      #self.dropout_keep_prob_ = tf.constant(0.5, name="dropout_keep_prob")
+      self.dropout_keep_prob_ = tf.placeholder(tf.float32, name="dropout_keep_prob")
+      
       # For gradient clipping, if you use it.
       # Due to a bug in TensorFlow, this needs to be an ordinary python
       # constant instead of a tf.constant.
@@ -107,7 +109,6 @@ class RNNLM(object):
     # Initial hidden state. You'll need to overwrite this with cell.zero_state
     # once you construct your RNN cell.
     
-    # ==> "ONCE?"=> when
     self.initial_h_ = None
 
     # Final hidden state. You'll need to overwrite this with the output from
@@ -115,21 +116,21 @@ class RNNLM(object):
     # applicable).
     
     # ==> the variable
-    self.final_h_ = tf.placeholder(tf.float32, [None, None, self.H], name = "final_h")
+    self.final_h_ = None
 
     # Output logits, which can be used by loss functions or for prediction.
     # Overwrite this with an actual Tensor of shape [batch_size, max_time]
     
     # =>=>=>
     # logits = o (or h) x Wout + b, where o is of size 1xH, Wout is HxV or Hxk, and b is V
-    self.logits_ = tf.placeholder(tf.float32, [None, None, self.H], name = "logits")
+    self.logits_ = None
 
     # Should be the same shape as inputs_w_
     self.target_y_ = tf.placeholder(tf.int32, [None, None], name="y")
 
     # Replace this with an actual loss function
     #self.loss_ = tf.reduced_sum(tf.nn.softmax(self.logits_, dim=-1, name=None))
-    self.loss_ = tf.placeholder(tf.int32, [None, None, self.H], name="loss")
+    self.loss_ = None
 
     # Get dynamic shape info from inputs
     with tf.name_scope("batch_size"):
@@ -145,38 +146,63 @@ class RNNLM(object):
     self.ns_ = tf.tile([self.max_time_], [self.batch_size_,], name="ns")
 
     #### YOUR CODE HERE ####
+    
+    # seed
+    self.seed = 0
 
     # Construct embedding layer
     # from V x H to H
-    self.em_mat_ = tf.Variable(tf.random_uniform([self.V, self.H], minval=-1.0, maxval=1.0, seed=0), name="em_mat")
-    self.em_b_ = tf.Variable(tf.zeros(self.V), dtype=tf.float32, name="em_b")
-    self.em_lu_ = tf.reshape(tf.nn.embedding_lookup(params=(self.em_mat_), ids=tf.reshape(self.input_w_, [-1])), [self.batch_size_, self.max_time_, self.H], name="em_lu")
     
-    self.em_lu_b = tf.reshape(tf.nn.embedding_lookup(params=(self.em_b_), ids=tf.reshape(self.input_w_, [-1])), [self.batch_size_, self.max_time_, self.H], name="em_lu_b")
-
+    # notation: i am going to use b for batch_size, and t for max_time in the comments
+    
+    # Wem of shape(V, H), the embedding layer weight matrix, or the lookup table
+    self.Wem_ = tf.Variable(tf.random_uniform([self.V, self.H], minval=-1.0, maxval=1.0, seed=0), name="Wem")
+    
+    # no bem, not like part 1, which was there because it participates on the loss_ for the embedding learning, now only em_W
+    # is needed for the overall RNNML learningN
+    # self.bem_ = tf.Variable(tf.zeros(self.V), dtype=tf.float32, name="bem_")
+    
+    # the input_x_ of shape(b, t, H), the input vector, from the lookup of intput_w_ of the shape [b, t], 
+    # an index int between 0 and V - 1 against the lookup table Wem,
+    # i don't think the inner reshape to the input_w_ is necessary, but i did it anyway
+    self.input_x_ = tf.reshape(tf.nn.embedding_lookup(params=(self.Wem_), 
+        ids=self.input_w_), [self.batch_size_, self.max_time_, self.H], name="x")
+    
     # Construct RNN/LSTM cell and recurrent layer (hint: use tf.nn.dynamic_rnn)
-    # from 2*H to H
+    
+    # create the fancy cell, a LSTM cell (with 4 affine layers)
     self.cell_ = MakeFancyRNNCell(self.H, self.dropout_keep_prob_, self.num_layers)
     
-    #self.inital_h_ = tf.reshape(self.cell_.zero_state(self.batch_size_ * self.H, dtype=tf.float32), [self.batch_size_, self.H])
-    self.inital_h_ = self.cell_.zero_state(self.batch_size_, dtype=tf.float32)
-    #=> tf.nn.dynamic_rnn(cell, inputs, sequence_length=None, initial_state=None, dtype=None, parallel_iterations=None, swap_memory=False, time_major=False, scope=None)
-    self.rnn_output_, self.final_h_ = tf.nn.dynamic_rnn(self.cell_, inputs=self.em_lu_, sequence_length=self.ns_, initial_state=self.initial_h_, dtype=tf.float32)
+    # initial_h_ of shape(b, t, H), supposedly, the initial hidden state for the rnn layer
+    #self.initial_h_ = tf.placeholder(tf.float32, [None, None, self.H], name="inital_h")
+    # initialize it to all zeros at the beginning
+    #print self.initial_h_.get_shape() 
+    self.initial_h_ = self.cell_.zero_state(self.batch_size_, dtype=tf.float32)
+
+    # ouput of shape(b, t, H), the output state or vector from the rnn layer, or the input to the output layer
+    # final_h of shape(b, t, H), the final state from the rnn layer
+    self.output_, self.final_h_ = tf.nn.dynamic_rnn(self.cell_, inputs=self.input_x_, 
+        sequence_length=self.ns_, initial_state=self.initial_h_, dtype=tf.float32)
+   
 
     # Softmax output layer, over vocabulary
     # Hint: use the matmul3d() helper here.
     
-    # => matmul3d(), [batch, max_time, H] x [H, V]
-
-    # => output = p^hat (w(i+1)) = softmax(o(i)Wout+bout)
-    # => tf.nn.softmax(logits, name=None)
-    self.Wout_ = tf.Variable(tf.random_uniform([self.H, self.V], minval=-1.0, maxval=1.0, seed=0), name="Wout")
-    self.bout_ = tf.Variable(tf.random_uniform([self.V], minval=-1.0, maxval=1.0, seed=0), name="bout")
-    self.logits_ = matmul3d(self.rnn_output_, self.Wout_) + self.bout_
-    self.output_ = tf.nn.softmax(self.logits_, name="output")
+    # Wout of shape(H, V), the output layer weight matrix, and 
+    # bout of shape(V), the output layer bias vector
+    self.Wout_ = tf.Variable(tf.random_uniform([self.H, self.V], minval=-1.0, maxval=1.0, seed=self.seed), name="Wout")
+    self.bout_ = tf.Variable(tf.random_uniform([self.V], minval=-1.0, maxval=1.0, seed=self.seed), name="bout")
+    
+    # logits of shape(b, t, H), the logits from the output layer, for the whole RNNLM
+    self.logits_ = tf.reshape(matmul3d(self.output_, self.Wout_), [self.batch_size_, self.max_time_, self.V]) #+ self.bout_
+    #print self.logits_.get_shape()
+    
+    # y^hat of shape(b, t), the softmax from the logits
+    self.y_hat_ = tf.reshape(tf.argmax(tf.reshape(self.logits_, [-1, self.V]), 1, name="y_hat"), [self.batch_size_, self.max_time_])
+    #print self.y_hat_.get_shape()
     
     # Loss computation (true loss, for prediction)
-    # => tf.nn.softmax_cross_entropy_with_logits(logits, labels, name=None)
+    # loss of shape (), a scalar of the true loss, or the sum of the cross entrypy loss over the logits
     self.loss_ = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(self.logits_, self.target_y_, name = "loss"))    
 
     #### END(YOUR CODE) ####
@@ -204,15 +230,22 @@ class RNNLM(object):
     # Define loss function(s)
     with tf.name_scope("Train_Loss"):
       # Placeholder: replace with a sampled loss
-      self.train_loss_ = tf.reduce_sum(tf.nn.sampled_softmax_loss(tf.transpose(self.Wout_), self.bout_, tf.reshape(self.rnn_output_, [-1, self.H]), labels=self.target_y_, num_sampled=5000, num_classes=self.V, num_true=5000, sampled_values=None, remove_accidental_hits=True, partition_strategy='mod', name='train_loss'))
+    
+      #  train_loss of shape(), the sum of a sampled softmax loss over the sampled 
+      self.num_sampled = 100
+      self.train_loss_ = tf.reduce_sum(tf.nn.sampled_softmax_loss(tf.transpose(self.Wout_), self.bout_, 
+          tf.reshape(self.output_, [-1, self.H]), labels=tf.reshape(self.target_y_, [-1,1]), num_sampled=self.num_sampled, 
+          num_classes=self.V, name='train_loss'))
+      #self.train_loss_ = self.loss_
       
 
     # Define optimizer and training op
     with tf.name_scope("Training"):
-        self.train_step_ = None  # Placeholder: replace with an actual op
-        self.alpha_ = tf.placeholder(tf.float32, name="learning_rate")
-        self.optimizer_ = tf.train.AdagradOptimizer(self.alpha_)
+        self.optimizer_ = tf.train.AdagradOptimizer(self.learning_rate_)
         self.train_step_ = self.optimizer_.minimize(self.train_loss_)
+    
+    # Initializer step: done explicitly in c. run training
+    # init_ = tf.initialize_all_variables()
 
     #### END(YOUR CODE) ####
 
@@ -229,8 +262,11 @@ class RNNLM(object):
     self.pred_samples_ = None
 
     #### YOUR CODE HERE ####
+    #self.pred_proba_ = tf.nn.softmax(self.logits_, name="pred_proba")
+    #self.pred_max_ = tf.argmax( self. logits_, 1, name="pred_max")
 
-    self.pred_samples_ = tf.reshape(tf.multinomial(tf.reshape(self.logits_, [-1, self.V]), 5000, name="pred_samples"), [-1, 1])
+    self.pred_samples_ = tf.reshape(tf.multinomial(tf.reshape(self.logits_, [-1, self.V]), 1), [self.batch_size_, self.max_time_, 1])
+    
 
     #### END(YOUR CODE) ####
 
