@@ -191,10 +191,10 @@ class RNNLM(object):
     # Wout of shape(H, V), the output layer weight matrix, and 
     # bout of shape(V), the output layer bias vector
     self.Wout_ = tf.Variable(tf.random_uniform([self.H, self.V], minval=-1.0, maxval=1.0, seed=self.seed), name="Wout")
-    self.bout_ = tf.Variable(tf.random_uniform([self.V], minval=-1.0, maxval=1.0, seed=self.seed), name="bout")
+    self.bout_ = tf.Variable(tf.zeros([self.V]), dtype=tf.float32, name="b")
     
     # logits of shape(b, t, H), the logits from the output layer, for the whole RNNLM
-    self.logits_ = tf.reshape(matmul3d(self.output_, self.Wout_), [self.batch_size_, self.max_time_, self.V]) #+ self.bout_
+    self.logits_ = tf.reshape(matmul3d(self.output_, self.Wout_) + self.bout_, [self.batch_size_, self.max_time_, self.V])
     #print self.logits_.get_shape()
     
     # y^hat of shape(b, t), the softmax from the logits
